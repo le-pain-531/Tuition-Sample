@@ -1,1 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrightMinds Tuition Centre</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@4.5.0/index.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@4.5.0/index.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/intersection-observer@0.12.0/intersection-observer.min.js"></script>
+    <style>
+        :root {
+            --brown-light: #E8D5C4;
+            --brown: #C4A882;
+            --brown-dark: #A68B6B;
+            --brown-darker: #8B7355;
+            --cream: #FAF6F2;
+            --white: #FFFFFF;
+        }
+
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: #4A3F35;
+            overflow-x: hidden;
+        }
+
+        .font-heading { font-family: 'Playfair Display', serif; }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 2px 20px rgba(139,115,85,0.1);
+            transition: all 0.4s ease;
+        }
+        .navbar.scrolled { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--brown-dark);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        /* Hero */
+        .hero-section {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #FAF6F2 0%, #E8D5C4 50%, #D4B896 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(circle at 20% 50%, rgba(196,168,130,0.15) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, rgba(166,139,107,0.12) 0%, transparent 40%),
+                              radial-gradient(circle at 60% 80%, rgba(139,115,85,0.1) 0%, transparent 45%);
+            animation: patternFloat 20s ease-in-out infinite;
+        }
+        @keyframes patternFloat {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-2%, 2%); }
+        }
+        .hero-floating {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(196,168,130,0.2);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+        .hero-text { animation: fadeInUp 1s ease-out forwards; opacity: 0; }
+        .hero-text-delay { animation: fadeInUp 1s ease-out 0.3s forwards; opacity: 0; }
+        .hero-btn { animation: fadeInUp 1s ease-out 0.6s forwards; opacity: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brown-dark), var(--brown-darker));
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(139,115,85,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139,115,85,0.4); }
+
+        .btn-outline {
+            border: 2px solid var(--brown-dark);
+            color: var(--brown-dark);
+            padding: 0.9rem 2.3rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+        .btn-outline:hover {
+            background: var(--brown-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Section Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal-left.visible { opacity: 1; transform: translateX(0); }
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(139,115,85,0.08);
+            transition: all 0.4s ease;
+        }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(139,115,85,0.15); }
+        .card-image { overflow: hidden; height: 220px; }
+        .card-image img { transition: transform 0.6s ease; width: 100%; height: 100%; object-fit: cover; }
+        .card:hover .card-image img { transform: scale(1.1); }
+
+        /* Counter */
+        .counter-box {
+            padding: 2rem;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 8px 30px rgba(139,115,85,0.08);
+            transition: all 0.3s ease;
+        }
+        .counter-box:hover { transform: scale(1.05); box-shadow: 0 12px 40px rgba(139,115,85,0.15); }
+
+        /* Map */
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(139,115,85,0.15);
+        }
+
+        /* Form */
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid #E5DDD4;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--brown);
+            box-shadow: 0 0 0 4px rgba(196,168,130,0.2);
+        }
+        .form-input::placeholder { color: #B8A99A; }
+
+        /* Location Pin */
+        .location-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(139,115,85,0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--brown);
+        }
+        .location-card:hover { transform: translateX(10px); box-shadow: 0 12px 35px rgba(139,115,85,0.15); }
+
+        /* Testimonial */
+        .testimonial-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 35px rgba(139,115,85,0.08);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .testimonial-card:hover { transform: translateY(-5px); }
+        .testimonial-card::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 6rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--brown-light);
+            line-height: 1;
+        }
+
+        /* Footer */
+        .footer-section {
+            background: linear-gradient(135deg, #4A3F35, #3D3329);
+            color: #E8D5C4;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s ease;
+        }
+        .mobile-menu.open { transform: translateX(0); }
+
+        /* Subject Tags */
+        .subject-tag {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--brown-light);
+            color: var(--brown-darker);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .subject-tag:hover {
+            background: var(--brown-dark);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.5s ease;
+            border-left: 4px solid #4CAF50;
+        }
+        .toast.show { transform: translateX(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar fixed w-full z-50 transition-all duration-300 py-4" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <a href="#home" class="flex items-center gap-2">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="18" fill="#C4A882"/>
+                    <path d="M12 25L20 13L28 25H12Z" fill="#FAF6F2"/>
+                    <circle cx="20" cy="11" r="3" fill="#8B7355"/>
+                </svg>
+                <span class="font-heading text-2xl font-bold" style="color: #8B7355;">BrightMinds</span>
+            </a>
+            
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#home" class="nav-link text-sm font-semibold tracking-wide uppercase" style="color: #6B5B4E;">Home</a>
+                <a href="#about" class="nav-link text-sm font-semibold tracking-wide uppercase" style="color: #6B5B4E;">About Us</a>
+                <a href="#locations" class="nav-link text-sm font-semibold tracking-wide uppercase" style="color: #6B5B4E;">Locations</a>
+                <a href="#booking" class="nav-link text-sm font-semibold tracking-wide uppercase" style="color: #6B5B4E;">Book a Class</a>
+                <a href="#contact" class="nav-link text-sm font-semibold tracking-wide uppercase" style="color: #6B5B4E;">Contact</a>
+                <a href="#booking" class="btn-primary text-sm">Book Now</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden p-2" id="menuBtn" onclick="toggleMenu()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu fixed top-0 right-0 w-72 h-full bg-white shadow-2xl z-50 p-8" id="mobileMenu">
+        <button class="absolute top-6 right-6" onclick="toggleMenu()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2">
+                <path d="M6 6l12 12M6 18L18 6"/>
+            </svg>
+        </button>
+        <div class="flex flex-col gap-6 mt-16">
+            <a href="#home" class="text-lg font-semibold" style="color: #6B5B4E;" onclick="toggleMenu()">Home</a>
+            <a href="#about" class="text-lg font-semibold" style="color: #6B5B4E;" onclick="toggleMenu()">About Us</a>
+            <a href="#locations" class="text-lg font-semibold" style="color: #6B5B4E;" onclick="toggleMenu()">Locations</a>
+            <a href="#booking" class="text-lg font-semibold" style="color: #6B5B4E;" onclick="toggleMenu()">Book a Class</a>
+            <a href="#contact" class="text-lg font-semibold" style="color: #6B5B4E;" onclick="toggleMenu()">Contact</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section flex items-center pt-20">
+        <div class="hero-bg-pattern"></div>
+        <div class="hero-floating w-32 h-32 top-20 right-20" style="animation-delay: 0s;"></div>
+        <div class="hero-floating w-20 h-20 bottom-32 left-16" style="animation-delay: 1s; animation-duration: 5s;"></div>
+        <div class="hero-floating w-16 h-16 top-40 left-1/3" style="animation-delay: 2s; animation-duration: 7s;"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
+            <div>
+                <div class="hero-text">
+                    <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-6" style="background: rgba(139,115,85,0.15); color: #8B7355;">
+                        🌟 Trusted by 2,500+ Students
+                    </span>
+                </div>
+                <h1 class="font-heading text-5xl md:text-6xl font-bold leading-tight mb-6 hero-text-delay" style="color: #3D3329;">
+                    Empowering Students to <span style="color: #8B7355;">Achieve Excellence</span>
+                </h1>
+                <p class="text-lg mb-8 hero-btn" style="color: #6B5B4E; line-height: 1.8;">
+                    Join Singapore's leading tuition centre where personalized learning meets proven results. From Primary to JC levels, we nurture potential and build confidence.
+                </p>
+                <div class="flex gap-4 hero-btn flex-wrap">
+                    <a href="#booking" class="btn-primary">Book a Free Trial</a>
+                    <a href="#about" class="btn-outline">Learn More</a>
+                </div>
+            </div>
+            <div class="relative hero-text-delay hidden md:block">
+                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c476?w=600&h=500&fit=crop" 
+                     alt="Students learning" 
+                     class="rounded-3xl shadow-2xl w-full object-cover"
+                     style="box-shadow: 0 30px 60px rgba(139,115,85,0.25);"
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 w-full h-96 flex items-center justify-center\'><div class=\'text-center\'><div class=\'text-6xl mb-4\'>📚</div><p class=\'font-heading text-2xl font-bold\' style=\'color:#8B7355;\'>BrightMinds Learning</p></div></div>'">
+                <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl animate-pulse">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">✓</div>
+                        <div>
+                            <p class="font-bold text-sm">98% Pass Rate</p>
+                            <p class="text-xs text-gray-500">2025 Results</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="text-2xl">⭐⭐⭐⭐⭐</div>
+                        <div>
+                            <p class="font-bold text-sm">4.9/5 Rating</p>
+                            <p class="text-xs text-gray-500">Google Reviews</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 scroll-indicator">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="#8B7355" stroke-width="2">
+                <path d="M15 5v20M8 18l7 7 7-7"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Section Header -->
+            <div class="text-center mb-16 reveal">
+                <span class="text-sm font-semibold uppercase tracking-wider" style="color: #C4A882;">Who We Are</span>
+                <h2 class="font-heading text-4xl md:text-5xl font-bold mt-3 mb-4" style="color: #3D3329;">About BrightMinds</h2>
+                <div class="w-20 h-1 mx-auto rounded-full" style="background: linear-gradient(90deg, #C4A882, #8B7355);"></div>
+                <p class="mt-6 text-lg max-w-2xl mx-auto" style="color: #6B5B4E;">
+                    For over 12 years, we've been shaping the academic futures of students across Singapore with dedication and proven teaching methodologies.
+                </p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20 reveal">
+                <div class="counter-box text-center">
+                    <div class="text-4xl font-bold mb-2" style="color: #8B7355;" id="stat1">0</div>
+                    <div class="text-sm font-medium" style="color: #6B5B4E;">Years of Excellence</div>
+                </div>
+                <div class="counter-box text-center">
+                    <div class="text-4xl font-bold mb-2" style="color: #8B7355;" id="stat2">0</div>
+                    <div class="text-sm font-medium" style="color: #6B5B4E;">Students Enrolled</div>
+                </div>
+                <div class="counter-box text-center">
+                    <div class="text-4xl font-bold mb-2" style="color: #8B7355;" id="stat3">0</div>
+                    <div class="text-sm font-medium" style="color: #6B5B4E;">Expert Tutors</div>
+                </div>
+                <div class="counter-box text-center">
+                    <div class="text-4xl font-bold mb-2" style="color: #8B7355;" id="stat4">0%</div>
+                    <div class="text-sm font-medium" style="color: #6B5B4E;">Pass Rate</div>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="card p-8 reveal" style="transition-delay: 0.1s;">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style="background: #F0E6DC;">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4L4 10v12l12 6 12-6V10L16 4z" fill="#C4A882" stroke="#8B7355" stroke-width="1.5"/>
+                            <path d="M4 10l12 6M16 16v12M16 16l12-6" stroke="#8B7355" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3" style="color: #3D3329;">Comprehensive Curriculum</h3>
+                    <p class="text-sm leading-relaxed" style="color: #6B5B4E;">
+                        Our carefully crafted curriculum covers all subjects from Primary to Junior College level, aligned with MOE syllabus.
+                    </p>
+                </div>
+                <div class="card p-8 reveal" style="transition-delay: 0.2s;">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style="background: #F0E6DC;">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <circle cx="16" cy="12" r="5" fill="#C4A882" stroke="#8B7355" stroke-width="1.5"/>
+                            <circle cx="8" cy="18" r="4" fill="#C4A882" stroke="#8B7355" stroke-width="1.5"/>
+                            <circle cx="24" cy="18" r="4" fill="#C4A882" stroke="#8B7355" stroke-width="1.5"/>
+                            <path d="M12 28h8M6 22h-2M26 22h2" stroke="#8B7355" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3" style="color: #3D3329;">Small Class Sizes</h3>
+                    <p class="text-sm leading-relaxed" style="color: #6B5B4E;">
+                        Maximum 12 students per class ensuring personalized attention and effective learning for every child.
+                    </p>
+                </div>
+                <div class="card p-8 reveal" style="transition-delay: 0.3s;">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style="background: #F0E6DC;">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4v8l6 3" stroke="#8B7355" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="16" cy="16" r="12" stroke="#8B7355" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading text-xl font-bold mb-3" style="color: #3D3329;">Flexible Schedule</h3>
+                    <p class="text-sm leading-relaxed" style="color: #6B5B4E;">
+                        Choose from weekday or weekend classes. We offer morning, afternoon, and evening slots to suit your schedule.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Subjects -->
+            <div class="text-center reveal">
+                <h3 class="font-heading text-2xl font-bold mb-6" style="color: #3D3329;">Subjects We Offer</h3>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="subject-tag">English</span>
+                    <span class="subject-tag">Mathematics</span>
+                    <span class="subject-tag">Science</span>
+                    <span class="subject-tag">Physics</span>
+                    <span class="subject-tag">Chemistry</span>
+                    <span class="subject-tag">Biology</span>
+                    <span class="subject-tag">Chinese</span>
+                    <span class="subject-tag">Malay</span>
+                    <span class="subject-tag">Higher Mathematics</span>
+                    <span class="subject-tag">Economics</span>
+                    <span class="subject-tag">Geography</span>
+                    <span class="subject-tag">History</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Locations Section -->
+    <section id="locations" class="py-24" style="background: linear-gradient(180deg, #FAF6F2, #F5EDE4);">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="text-sm font-semibold uppercase tracking-wider" style="color: #C4A882;">Find Us</span>
+                <h2 class="font-heading text-4xl md:text-5xl font-bold mt-3 mb-4" style="color: #3D3329;">Our Locations</h2>
+                <div class="w-20 h-1 mx-auto rounded-full" style="background: linear-gradient(90deg, #C4A882, #8B7355);"></div>
+                <p class="mt-6 text-lg max-w-2xl mx-auto" style="color: #6B5B4E;">
+                    Conveniently located across Singapore with easy access to MRT stations and bus stops.
+                </p>
+            </div>
+
+            <!-- Map -->
+            <div class="map-container reveal mb-12">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255282.35826817226!2d103.6206269!3d1.3145599!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da11238ab35c63%3A0x5c3b508f3c536529!2sSingapore!5e0!3m2!1sen!2ssg!4v1700000000000!5m2!1sen!2ssg"
+                    width="100%" 
+                    height="450" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+
+            <!-- Location Cards -->
+            <div class="grid md:grid-cols-3 gap-8 reveal">
+                <div class="location-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: #F0E6DC;">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 2C6.686 2 4 4.686 4 8c0 5.25 6 10 6 10s6-4.75 6-10c0-3.314-2.686-6-6-6z" fill="#8B7355"/>
+                                <circle cx="10" cy="8" r="2.5" fill="#FAF6F2"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-heading text-lg font-bold" style="color: #3D3329;">Jurong East Branch</h4>
+                    </div>
+                    <p class="text-sm mb-2" style="color: #6B5B4E;">📍 134 Jurong Gateway Road, #03-301, Singapore 600134</p>
+                    <p class="text-sm mb-2" style="color: #6B5B4E;">🚇 Nearest MRT: Jurong East (NS1/EW24)</p>
+                    <p class="text-sm" style="color: #6B5B4E;">📞 +65 6555 1234</p>
+                </div>
+
+                <div class="location-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: #F0E6DC;">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 2C6.686 2 4 4.686 4 8c0 5.25 6 10 6 10s6-4.75 6-10c0-3.314-2.686-6-6-6z" fill="#8B7355"/>
+                                <circle cx="10" cy="8" r="2.5" fill="#FAF6F2"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-heading text-lg font-bold" style="color: #3D3329;">Tampines Branch</h4>
+                    </div>
+                    <p class="text-sm mb-2" style="color: #6B5B4E;">📍 5 Tampines Central 6, #05-18, Singapore 529482</p>
+                    <p class="text-sm mb-2" style="color: #6B5B4E;">🚇 Nearest MRT: Tampines (EW2/DT32)</p>
+                    <p class="text-sm" style="color: #6B5B4E;">📞 +65 6555 5678</p>
+                </div>
+
+                <div class="location-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: #F0E6DC;">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 2C6.686 2 4 4.686 4 8c0 5.25 6 10 6 10s6-4.75 6-10c0-3.314-2.686-6-6-6z" fill="#8B7355"/>
+                                <circle cx="10" cy="8" r="2.5" fill="#FAF6F2"/>
+                            </svg>
+                        </div>
+                        <h4 class="font-heading text-lg font-bold" style="color: #3D3329;">Bishan Branch</h4>
+                    </div>
+                    <p class="text-sm mb-2" style="color: #6B5B4E;">📍 50 Bishan Road, #02-01, Singapore 579803</p>
+                    <p class="text-sm mb-2" style="color: #6B5B4E;">🚇 Nearest MRT: Bishan (NS17/CC15)</p>
+                    <p class="text-sm" style="color: #6B5B4E;">📞 +65 6555 9012</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-start">
+                <!-- Left Info -->
+                <div class="reveal-left">
+                    <span class="text-sm font-semibold uppercase tracking-wider" style="color: #C4A882;">Enroll Now</span>
+                    <h2 class="font-heading text-4xl md:text-5xl font-bold mt-3 mb-6" style="color: #3D3329;">Book a Class Today</h2>
+                    <div class="w-20 h-1 rounded-full mb-6" style="background: linear-gradient(90deg, #C4A882, #8B7355);"></div>
+                    <p class="text-lg mb-8 leading-relaxed" style="color: #6B5B4E;">
+                        Fill out the form and our team will contact you within 24 hours to confirm your class schedule. First trial class is completely free!
+                    </p>
+                    
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: #F0E6DC;">✓</div>
+                            <div>
+                                <p class="font-semibold" style="color: #3D3329;">Free Trial Class</p>
+                                <p class="text-sm" style="color: #6B5B4E;">No obligation, no payment required</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: #F0E6DC;">✓</div>
+                            <div>
+                                <p class="font-semibold" style="color: #3D3329;">Personalized Assessment</p>
+                                <p class="text-sm" style="color: #6B5B4E;">We evaluate your current academic level</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: #F0E6DC;">✓</div>
+                            <div>
+                                <p class="font-semibold" style="color: #3D3329;">Flexible Scheduling</p>
+                                <p class="text-sm" style="color: #6B5B4E;">Choose from available time slots</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-6" style="background: linear-gradient(135deg, #F5EDE4, #FAF6F2);">
+                        <div class="flex items-center gap-4">
+                            <div class="text-4xl">🎓</div>
+                            <div>
+                                <p class="font-heading text-xl font-bold" style="color: #3D3329;">Limited Spots Available</p>
+                                <p class="text-sm" style="color: #6B5B4E;">Classes start from SGD $40/session</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <div class="reveal-right">
+                    <form action="https://formsubmit.co/qycchn@gmail.com" method="POST" class="card p-8 md:p-10" id="bookingForm">
+                        <input type="hidden" name="_subject" value="New Class Booking - BrightMinds Tuition">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_next" value="#">
+                        
+                        <h3 class="font-heading text-2xl font-bold mb-6" style="color: #3D3329;">Booking Form</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Parent/Guardian Name *</label>
+                                <input type="text" name="parent_name" required class="form-input" placeholder="e.g. Tan Ah Meng">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Student Name *</label>
+                                <input type="text" name="student_name" required class="form-input" placeholder="e.g. Tan Wei Jie">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Email Address *</label>
+                                <input type="email" name="email" required class="form-input" placeholder="e.g. parent@email.com">
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Phone Number *</label>
+                                <input type="tel" name="phone" required class="form-input" placeholder="e.g. +65 9123 4567">
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Student's Level *</label>
+                                <select name="level" required class="form-input">
+                                    <option value="">Select Level</option>
+                                    <option value="Primary 1">Primary 1</option>
+                                    <option value="Primary 2">Primary 2</option>
+                                    <option value="Primary 3">Primary 3</option>
+                                    <option value="Primary 4">Primary 4</option>
+                                    <option value="Primary 5">Primary 5</option>
+                                    <option value="Primary 6">Primary 6</option>
+                                    <option value="Secondary 1">Secondary 1</option>
+                                    <option value="Secondary 2">Secondary 2</option>
+                                    <option value="Secondary 3">Secondary 3</option>
+                                    <option value="Secondary 4">Secondary 4</option>
+                                    <option value="Junior College 1">Junior College 1</option>
+                                    <option value="Junior College 2">Junior College 2</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Preferred Branch *</label>
+                                <select name="branch" required class="form-input">
+                                    <option value="">Select Branch</option>
+                                    <option value="Jurong East">Jurong East</option>
+                                    <option value="Tampines">Tampines</option>
+                                    <option value="Bishan">Bishan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-5">
+                            <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Subjects Interested In *</label>
+                            <select name="subjects" required class="form-input" multiple style="height: 120px;">
+                                <option value="English">English</option>
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Science">Science</option>
+                                <option value="Physics">Physics</option>
+                                <option value="Chemistry">Chemistry</option>
+                                <option value="Biology">Biology</option>
+                                <option value="Chinese">Chinese</option>
+                                <option value="Higher Mathematics">Higher Mathematics</option>
+                                <option value="Economics">Economics</option>
+                                <option value="Geography">Geography</option>
+                            </select>
+                            <p class="text-xs mt-1" style="color: #A68B6B;">Hold Ctrl/Cmd to select multiple subjects</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Preferred Day</label>
+                                <select name="preferred_day" class="form-input">
+                                    <option value="">Select Day</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                    <option value="Saturday">Saturday</option>
+                                    <option value="Sunday">Sunday</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Preferred Time</label>
+                                <select name="preferred_time" class="form-input">
+                                    <option value="">Select Time</option>
+                                    <option value="Morning (9am-12pm)">Morning (9am-12pm)</option>
+                                    <option value="Afternoon (1pm-5pm)">Afternoon (1pm-5pm)</option>
+                                    <option value="Evening (6pm-9pm)">Evening (6pm-9pm)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Additional Message</label>
+                            <textarea name="message" rows="4" class="form-input" placeholder="Any special requirements or questions..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full text-center text-lg" id="submitBtn">
+                            Submit Booking Request
+                        </button>
+                        <p class="text-center text-xs mt-4" style="color: #A68B6B;">We will contact you within 24 hours to confirm your booking.</p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-24" style="background: linear-gradient(180deg, #F5EDE4, #FAF6F2);">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="text-sm font-semibold uppercase tracking-wider" style="color: #C4A882;">Testimonials</span>
+                <h2 class="font-heading text-4xl md:text-5xl font-bold mt-3 mb-4" style="color: #3D3329;">What Parents Say</h2>
+                <div class="w-20 h-1 mx-auto rounded-full" style="background: linear-gradient(90deg, #C4A882, #8B7355);"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="testimonial-card reveal" style="transition-delay: 0.1s;">
+                    <div class="flex items-center gap-3 mb-4 mt-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-200 to-orange-200 flex items-center justify-center font-bold text-lg">SL</div>
+                        <div>
+                            <p class="font-semibold" style="color: #3D3329;">Sarah Lim</p>
+                            <p class="text-xs" style="color: #A68B6B;">Parent of P6 Student</p>
+                        </div>
+                    </div>
+                    <p class="text-sm leading-relaxed" style="color: #6B5B4E;">
+                        "My daughter's math grades improved from a C to an A in just 6 months! The tutors are incredibly patient and dedicated. Highly recommend!"
+                    </p>
+                    <div class="mt-3">⭐⭐⭐⭐⭐</div>
+                </div>
+                <div class="testimonial-card reveal" style="transition-delay: 0.2s;">
+                    <div class="flex items-center gap-3 mb-4 mt-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-200 to-orange-200 flex items-center justify-center font-bold text-lg">DT</div>
+                        <div>
+                            <p class="font-semibold" style="color: #3D3329;">David Tan</p>
+                            <p class="text-xs" style="color: #A68B6B;">Parent of S4 Student</p>
+                        </div>
+                    </div>
+                    <p class="text-sm leading-relaxed" style="color: #6B5B4E;">
+                        "BrightMinds helped my son prepare for his O-Levels. The structured approach and mock exams were exactly what he needed. He scored A1s in both Physics and Chemistry!"
+                    </p>
+                    <div class="mt-3">⭐⭐⭐⭐⭐</div>
+                </div>
+                <div class="testimonial-card reveal" style="transition-delay: 0.3s;">
+                    <div class="flex items-center gap-3 mb-4 mt-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-200 to-orange-200 flex items-center justify-center font-bold text-lg">MR</div>
+                        <div>
+                            <p class="font-semibold" style="color: #3D3329;">Mei Ling Rahim</p>
+                            <p class="text-xs" style="color: #A68B6B;">Parent of P4 Student</p>
+                        </div>
+                    </div>
+                    <p class="text-sm leading-relaxed" style="color: #6B5B4E;">
+                        "The small class size means my son gets individual attention. He now looks forward to tuition instead of dreading it. The environment is so positive!"
+                    </p>
+                    <div class="mt-3">⭐⭐⭐⭐⭐</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section id="contact" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal">
+                <span class="text-sm font-semibold uppercase tracking-wider" style="color: #C4A882;">Get in Touch</span>
+                <h2 class="font-heading text-4xl md:text-5xl font-bold mt-3 mb-4" style="color: #3D3329;">Contact Us</h2>
+                <div class="w-20 h-1 mx-auto rounded-full" style="background: linear-gradient(90deg, #C4A882, #8B7355);"></div>
+                <p class="mt-6 text-lg max-w-2xl mx-auto" style="color: #6B5B4E;">
+                    Have questions? We'd love to hear from you. Reach out through any of the channels below.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-8 mb-16">
+                <div class="card p-8 text-center reveal" style="transition-delay: 0.1s;">
+                    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #F0E6DC;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2" style="color: #3D3329;">Phone</h4>
+                    <p class="text-sm" style="color: #6B5B4E;">+65 6555 0000</p>
+                </div>
+                <div class="card p-8 text-center reveal" style="transition-delay: 0.2s;">
+                    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #F0E6DC;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                            <polyline points="22,6 12,13 2,6"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2" style="color: #3D3329;">Email</h4>
+                    <p class="text-sm" style="color: #6B5B4E;">info@brightminds.sg</p>
+                </div>
+                <div class="card p-8 text-center reveal" style="transition-delay: 0.3s;">
+                    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #F0E6DC;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2" style="color: #3D3329;">Operating Hours</h4>
+                    <p class="text-sm" style="color: #6B5B4E;">Mon-Sun: 9AM - 9PM</p>
+                </div>
+                <div class="card p-8 text-center reveal" style="transition-delay: 0.4s;">
+                    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background: #F0E6DC;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-2" style="color: #3D3329;">WhatsApp</h4>
+                    <p class="text-sm" style="color: #6B5B4E;">+65 9123 4567</p>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="max-w-2xl mx-auto reveal">
+                <form action="https://formsubmit.co/qycchn@gmail.com" method="POST" class="card p-8 md:p-10">
+                    <input type="hidden" name="_subject" value="New Contact Message - BrightMinds Tuition">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_template" value="table">
+                    
+                    <h3 class="font-heading text-2xl font-bold mb-6 text-center" style="color: #3D3329;">Send Us a Message</h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-5 mb-5">
+                        <div>
+                            <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Your Name *</label>
+                            <input type="text" name="name" required class="form-input" placeholder="Full name">
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Email *</label>
+                            <input type="email" name="email" required class="form-input" placeholder="Your email">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Subject *</label>
+                        <input type="text" name="subject" required class="form-input" placeholder="What is this about?">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="text-sm font-semibold block mb-2" style="color: #6B5B4E;">Message *</label>
+                        <textarea name="message" rows="5" required class="form-input" placeholder="Your message..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full text-center text-lg">
+                        Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-section py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="18" fill="#C4A882"/>
+                            <path d="M12 25L20 13L28 25H12Z" fill="#FAF6F2"/>
+                            <circle cx="20" cy="11" r="3" fill="#8B7355"/>
+                        </svg>
+                        <span class="font-heading text-xl font-bold text-amber-100">BrightMinds</span>
+                    </div>
+                    <p class="text-sm leading-relaxed" style="color: #A68B6B;">
+                        Empowering students since 2014. We are committed to providing the best education experience in Singapore.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-amber-100 mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm" style="color: #A68B6B;">
+                        <li><a href="#home" class="hover:text-amber-200 transition">Home</a></li>
+                        <li><a href="#about" class="hover:text-amber-200 transition">About Us</a></li>
+                        <li><a href="#locations" class="hover:text-amber-200 transition">Locations</a></li>
+                        <li><a href="#booking" class="hover:text-amber-200 transition">Book a Class</a></li>
+                        <li><a href="#contact" class="hover:text-amber-200 transition">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-amber-100 mb-4">Programs</h4>
+                    <ul class="space-y-2 text-sm" style="color: #A68B6B;">
+                        <li><a href="#" class="hover:text-amber-200 transition">Primary Tuition</a></li>
+                        <li><a href="#" class="hover:text-amber-200 transition">Secondary Tuition</a></li>
+                        <li><a href="#" class="hover:text-amber-200 transition">JC Tuition</a></li>
+                        <li><a href="#" class="hover:text-amber-200 transition">Holiday Programs</a></li>
+                        <li><a href="#" class="hover:text-amber-200 transition">Exam Bootcamps</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-amber-100 mb-4">Connect With Us</h4>
+                    <div class="flex gap-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#E8D5C4"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#E8D5C4"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="#E8D5C4" stroke-width="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" fill="none" stroke="#E8D5C4" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="#E8D5C4"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#E8D5C4"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                        </a>
+                    </div>
+                    <p class="text-sm" style="color: #A68B6B;">Follow us on social media for tips, updates, and student success stories!</p>
+                </div>
+            </div>
+            <div class="border-t border-white/10 pt-8 text-center">
+                <p class="text-sm" style="color: #A68B6B;">© 2025 BrightMinds Tuition Centre. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Counter Animation
+        function animateCounter(elementId, target, suffix = '') {
+            const element = document.getElementById(elementId);
+            const duration = 2000;
+            const steps = 60;
+            const increment = target / steps;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString() + suffix;
+            }, duration / steps);
+        }
+
+        let countersAnimated = false;
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !countersAnimated) {
+                    countersAnimated = true;
+                    animateCounter('stat1', 12, '+');
+                    animateCounter('stat2', 2500, '+');
+                    animateCounter('stat3', 45, '+');
+                    animateCounter('stat4', 98, '%');
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const statsSection = document.querySelector('.counter-box')?.parentElement;
+        if (statsSection) statsObserver.observe(statsSection);
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Active nav link highlighting
+        const sections = document.querySelectorAll('section[id]');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('open');
+        }
+
+        // Smooth scroll for all anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Form submission feedback
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                const btn = this.querySelector('button[type="submit"]');
+                if (btn) {
+                    btn.textContent = 'Sending...';
+                    btn.style.opacity = '0.7';
+                    btn.disabled = true;
+                }
+            });
+        });
+
+        // Parallax effect for hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero-bg-pattern');
+            if (hero && scrolled < window.innerHeight) {
+                hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        });
+
+        // Typing effect for hero (optional enhancement)
+        const heroTexts = ["Achieve Excellence", "Build Confidence", "Reach Your Potential"];
+        let heroIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        // Add floating particles
+        function createParticles() {
+            const hero = document.getElementById('home');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 6 + 2}px;
+                    height: ${Math.random() * 6 + 2}px;
+                    background: rgba(196,168,130,${Math.random() * 0.3 + 0.1});
+                    border-radius: 50%;
+                    top: ${Math.random() * 100}%;
+                    left: ${Math.random() * 100}%;
+                    animation: float ${Math.random() * 6 + 4}s ease-in-out infinite;
+                    animation-delay: ${Math.random() * 4}s;
+                `;
+                hero.appendChild(particle);
+            }
+        }
+        createParticles();
+    </script>
+</body>
+</html>
+
 
